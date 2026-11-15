@@ -1,257 +1,250 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10131c">
-  <title>Customizable Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090a0d">
+  <title>Calculator</title>
   <style>
     :root {
       color-scheme: dark;
-      --page: #10131c;
-      --surface: #1b2030;
-      --display: #111622;
-      --key: #292f41;
-      --key-hover: #373f55;
-      --text: #f5f7ff;
-      --muted: #9da7bd;
-      --accent: #8b7cff;
-      --accent-text: #ffffff;
-      --radius: 18px;
-      --scale: 1;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #090a0d;
+      --panel: #111216;
+      --screen: #111216;
+      --key: #333438;
+      --key-hover: #48494e;
+      --key-function: #a5a6aa;
+      --key-function-text: #090a0d;
+      --text: #fff;
+      --muted: #8d8e94;
+      --accent: #ff9f0a;
+      --accent-hover: #ffb638;
+      --radius: 999px;
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--font);
+      background: var(--page);
     }
-
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f2f2f7;
+      --panel: #fff;
+      --screen: #fff;
+      --key: #e5e5ea;
+      --key-hover: #d3d3da;
+      --key-function: #c7c7cc;
+      --key-function-text: #151519;
+      --text: #17171b;
+      --muted: #77777e;
+      --accent: #ff9500;
+      --accent-hover: #ffad33;
+    }
     * { box-sizing: border-box; }
     body {
       min-height: 100vh;
+      min-height: 100dvh;
       margin: 0;
-      padding: 28px;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
       display: grid;
       place-items: center;
       color: var(--text);
-      background: radial-gradient(ellipse at top, color-mix(in srgb, var(--accent) 15%, var(--page)), var(--page) 55%);
+      background: var(--page);
+      font-family: var(--font);
       transition: background .2s, color .2s;
     }
     button, input, select { font: inherit; }
-    button { color: inherit; }
-
-    .app {
-      width: min(100%, 930px);
-      display: grid;
-      grid-template-columns: minmax(290px, 430px) minmax(240px, 1fr);
-      gap: 22px;
-      align-items: start;
-    }
-    .calculator, .customizer {
-      background: color-mix(in srgb, var(--surface) 94%, transparent);
-      border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-      border-radius: calc(var(--radius) + 8px);
-      box-shadow: 0 24px 70px #0005;
-    }
-    .calculator { padding: 22px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .brand { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: .04em; }
-    .hint { color: var(--muted); font-size: 12px; }
-    .display {
-      min-height: 112px;
-      margin-bottom: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-end;
+    button { color: inherit; -webkit-tap-highlight-color: transparent; }
+    .app { width: min(100%, 430px); }
+    .calculator {
+      padding: clamp(16px, 5vw, 24px);
       overflow: hidden;
-      background: var(--display);
-      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid color-mix(in srgb, var(--text) 7%, transparent);
+      border-radius: 34px;
+      box-shadow: 0 24px 80px #0002;
+      transform: scale(var(--scale, 1));
+      transform-origin: top center;
+      transition: background .2s, transform .15s;
     }
-    .expression {
-      width: 100%;
-      min-height: 25px;
-      color: var(--muted);
-      text-align: right;
-      font-size: 15px;
-      overflow-wrap: anywhere;
+    .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 50%, transparent); }
+    .header-actions { display: flex; gap: 8px; }
+    .icon-button, .mode-button {
+      min-width: 40px; min-height: 40px; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      border-radius: 999px; background: color-mix(in srgb, var(--key) 36%, transparent); color: var(--text); cursor: pointer;
     }
-    .result {
-      width: 100%;
-      margin-top: 5px;
-      text-align: right;
-      font-size: clamp(30px, 7vw, 42px);
-      line-height: 1.15;
-      font-weight: 650;
-      overflow-wrap: anywhere;
-    }
-    .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .icon-button { font-size: 17px; }
+    .mode-button { font-size: 12px; font-weight: 700; }
+    .icon-button:hover, .mode-button:hover { background: var(--key); }
+    .display { min-height: 142px; padding: 18px 4px 20px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; overflow: hidden; }
+    .expression { width: 100%; min-height: 24px; color: var(--muted); text-align: right; font-size: 16px; overflow-wrap: anywhere; }
+    .result { width: 100%; margin-top: 7px; text-align: right; font-size: clamp(48px, 15vw, 70px); line-height: 1.05; font-weight: 300; letter-spacing: -.055em; overflow-wrap: anywhere; }
+    .keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(9px, 2.8vw, 13px); }
     .key {
-      min-height: 58px;
-      border: 0;
-      border-radius: var(--radius);
-      background: var(--key);
-      color: var(--text);
-      cursor: pointer;
-      font-size: 19px;
-      font-weight: 550;
-      transition: transform .08s, background .15s, filter .15s;
-      user-select: none;
+      min-width: 0; aspect-ratio: 1; padding: 0; border: 0; border-radius: var(--radius); background: var(--key); color: var(--text);
+      cursor: pointer; font-size: clamp(19px, 6vw, 25px); font-weight: 500; transition: transform .08s, background .15s, filter .15s; user-select: none;
     }
     .key:hover { background: var(--key-hover); }
-    .key:active { transform: scale(.96); }
-    .key.utility { color: var(--accent); }
-    .key.operator { background: color-mix(in srgb, var(--accent) 19%, var(--key)); }
-    .key.operator:hover { background: color-mix(in srgb, var(--accent) 30%, var(--key)); }
-    .key.equals { grid-column: span 2; background: var(--accent); color: var(--accent-text); }
-    .key.equals:hover { filter: brightness(1.1); }
-    .key.zero { grid-column: span 2; }
-
-    .customizer { padding: 22px; }
-    .customizer h2 { margin: 0 0 5px; font-size: 18px; }
-    .customizer > p { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    .control { margin: 15px 0; }
-    .control label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 7px; color: var(--muted); font-size: 13px; }
+    .key:active { transform: scale(.93); }
+    .key.function { background: var(--key-function); color: var(--key-function-text); font-size: clamp(15px, 4vw, 19px); font-weight: 600; }
+    .key.operator { background: var(--accent); color: #fff; font-size: 27px; font-weight: 450; }
+    .key.operator:hover, .key.equals:hover { background: var(--accent-hover); }
+    .key.operator.selected { background: var(--text); color: var(--accent); }
+    .key.equals { grid-column: span 2; aspect-ratio: auto; border-radius: 999px; background: var(--accent); color: #fff; font-size: 27px; }
+    .key.zero { grid-column: span 2; aspect-ratio: auto; padding-left: 27px; border-radius: 999px; text-align: left; }
+    .scientific { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(9px, 2.8vw, 13px); margin-bottom: 12px; }
+    .calculator.scientific-open .scientific { display: grid; }
+    .scientific .key { aspect-ratio: 1.12; font-size: clamp(14px, 4vw, 17px); }
+    .tools { margin-top: 18px; }
+    details { border-top: 1px solid color-mix(in srgb, var(--text) 9%, transparent); padding-top: 13px; }
+    summary { color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "＋"; float: right; color: var(--accent); font-size: 16px; }
+    details[open] summary::after { content: "−"; }
+    .customizer { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 16px 0 2px; }
+    .control label { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 7px; color: var(--muted); font-size: 12px; }
     .control output { color: var(--text); }
-    .control input[type="color"] { width: 100%; height: 38px; padding: 3px; border: 1px solid #ffffff20; border-radius: 10px; background: var(--display); cursor: pointer; }
-    .control select { width: 100%; padding: 10px 12px; color: var(--text); background: var(--display); border: 1px solid #ffffff20; border-radius: 10px; }
+    .control input[type="color"] { width: 100%; height: 38px; padding: 3px; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 10px; background: var(--screen); cursor: pointer; }
+    .control select { width: 100%; padding: 10px; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 10px; background: var(--screen); color: var(--text); }
     .control input[type="range"] { width: 100%; accent-color: var(--accent); }
-    .custom-buttons { display: flex; gap: 9px; margin-top: 20px; }
-    .small-button { flex: 1; padding: 10px; border: 1px solid #ffffff20; border-radius: 11px; background: var(--key); cursor: pointer; }
+    .custom-buttons { display: flex; grid-column: 1 / -1; gap: 9px; }
+    .small-button { flex: 1; padding: 10px; border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); border-radius: 11px; background: var(--key); cursor: pointer; font-size: 12px; }
     .small-button:hover { background: var(--key-hover); }
-    .status { min-height: 18px; margin-top: 10px; color: var(--muted); font-size: 12px; }
-    .footer { margin-top: 14px; color: var(--muted); font-size: 11px; line-height: 1.5; }
-
-    @media (max-width: 720px) {
-      body { padding: 16px; }
-      .app { max-width: 440px; grid-template-columns: 1fr; }
-      .customizer { padding: 18px; }
-      .key { min-height: 56px; }
-    }
+    .status { grid-column: 1 / -1; min-height: 16px; color: var(--muted); font-size: 11px; }
+    .footnote { margin: 13px 0 0; color: var(--muted); text-align: center; font-size: 11px; }
+    button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 3px; }
+    @media (max-height: 760px) and (min-width: 500px) { body { align-items: start; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
   </style>
 </head>
 <body>
   <main class="app">
-    <section class="calculator" aria-label="Calculator">
-      <div class="topbar">
-        <h1 class="brand">CALCULATOR</h1>
-        <span class="hint">Keyboard supported</span>
-      </div>
-      <div class="display" aria-live="polite">
+    <section class="calculator" id="calculator" aria-label="Calculator">
+      <header class="header">
+        <div class="brand"><span class="brand-dot"></span> Calculator</div>
+        <div class="header-actions">
+          <button class="mode-button" id="angleMode" aria-label="Toggle angle mode">DEG</button>
+          <button class="icon-button" id="themeToggle" aria-label="Switch to light mode" title="Switch theme">☼</button>
+        </div>
+      </header>
+      <div class="display" aria-live="polite" aria-atomic="true">
         <div class="expression" id="expression">&nbsp;</div>
         <div class="result" id="result">0</div>
       </div>
+
+      <div class="scientific" id="scientificKeys" aria-label="Scientific functions">
+        <button class="key function" data-insert="sin(">sin</button>
+        <button class="key function" data-insert="cos(">cos</button>
+        <button class="key function" data-insert="tan(">tan</button>
+        <button class="key function" data-insert="sqrt(">√</button>
+        <button class="key function" data-insert="asin(">sin⁻¹</button>
+        <button class="key function" data-insert="acos(">cos⁻¹</button>
+        <button class="key function" data-insert="atan(">tan⁻¹</button>
+        <button class="key function" data-insert="ln(">ln</button>
+        <button class="key function" data-insert="log(">log</button>
+        <button class="key function" data-insert="abs(">|x|</button>
+        <button class="key function" data-insert="π">π</button>
+        <button class="key function" data-insert="e">e</button>
+      </div>
+
       <div class="keys" id="keys">
-        <button class="key utility" data-action="clear" aria-label="Clear">AC</button>
-        <button class="key utility" data-value="(" aria-label="Open parenthesis">(</button>
-        <button class="key utility" data-value=")" aria-label="Close parenthesis">)</button>
-        <button class="key operator" data-value="/" aria-label="Divide">÷</button>
+        <button class="key function" data-action="clear" aria-label="Clear">AC</button>
+        <button class="key function" data-action="sign" aria-label="Change sign">+/−</button>
+        <button class="key function" data-insert="%" aria-label="Percent">%</button>
+        <button class="key operator" data-insert="/" aria-label="Divide">÷</button>
 
-        <button class="key" data-value="7">7</button>
-        <button class="key" data-value="8">8</button>
-        <button class="key" data-value="9">9</button>
-        <button class="key operator" data-value="*" aria-label="Multiply">×</button>
+        <button class="key" data-insert="7">7</button>
+        <button class="key" data-insert="8">8</button>
+        <button class="key" data-insert="9">9</button>
+        <button class="key operator" data-insert="*" aria-label="Multiply">×</button>
 
-        <button class="key" data-value="4">4</button>
-        <button class="key" data-value="5">5</button>
-        <button class="key" data-value="6">6</button>
-        <button class="key operator" data-value="-" aria-label="Subtract">−</button>
+        <button class="key" data-insert="4">4</button>
+        <button class="key" data-insert="5">5</button>
+        <button class="key" data-insert="6">6</button>
+        <button class="key operator" data-insert="-" aria-label="Subtract">−</button>
 
-        <button class="key" data-value="1">1</button>
-        <button class="key" data-value="2">2</button>
-        <button class="key" data-value="3">3</button>
-        <button class="key operator" data-value="+" aria-label="Add">+</button>
+        <button class="key" data-insert="1">1</button>
+        <button class="key" data-insert="2">2</button>
+        <button class="key" data-insert="3">3</button>
+        <button class="key operator" data-insert="+" aria-label="Add">+</button>
 
-        <button class="key utility" data-action="sign" aria-label="Change sign">±</button>
-        <button class="key zero" data-value="0">0</button>
-        <button class="key" data-value=".">.</button>
-        <button class="key utility" data-action="backspace" aria-label="Backspace">⌫</button>
-        <button class="key operator" data-value="^" aria-label="Power">xʸ</button>
-        <button class="key operator" data-value="%" aria-label="Percent">%</button>
-        <button class="key equals" data-action="equals" aria-label="Equals">=</button>
+        <button class="key function" data-action="scientific" id="scientificToggle" aria-label="Show scientific functions">2nd</button>
+        <button class="key zero" data-insert="0">0</button>
+        <button class="key" data-insert=".">.</button>
+        <button class="key operator" data-action="equals" aria-label="Equals">=</button>
       </div>
+
+      <div class="tools">
+        <details>
+          <summary>Personalize your calculator</summary>
+          <div class="customizer">
+            <div class="control"><label for="accent">Accent color</label><input id="accent" type="color" data-setting="accent" value="#ff9f0a"></div>
+            <div class="control"><label for="font">Font</label><select id="font" data-setting="font"><option value="system">System default</option><option value="Arial, sans-serif">Arial</option><option value="'Trebuchet MS', sans-serif">Trebuchet</option><option value="Georgia, serif">Georgia</option><option value="'Courier New', monospace">Monospace</option></select></div>
+            <div class="control"><label for="rounding">Button shape <output id="roundingValue">100%</output></label><input id="rounding" type="range" min="12" max="100" value="100" data-setting="radius"></div>
+            <div class="control"><label for="size">Calculator size <output id="sizeValue">100%</output></label><input id="size" type="range" min="85" max="110" value="100" data-setting="scale"></div>
+            <div class="custom-buttons"><button class="small-button" id="preset">Vibrant accent</button><button class="small-button" id="reset">Reset appearance</button></div>
+            <div class="status" id="status" role="status"></div>
+          </div>
+        </details>
+      </div>
+      <p class="footnote">A little math, a lot of personality.</p>
     </section>
-
-    <aside class="customizer" aria-label="Calculator customization">
-      <h2>Make it yours</h2>
-      <p>Change the colors, shape, and scale. Your design is saved in this browser.</p>
-      <div class="control"><label for="accent">Accent color</label><input id="accent" type="color" data-setting="accent" value="#8b7cff"></div>
-      <div class="control"><label for="page">Page background</label><input id="page" type="color" data-setting="page" value="#10131c"></div>
-      <div class="control"><label for="surface">Calculator panel</label><input id="surface" type="color" data-setting="surface" value="#1b2030"></div>
-      <div class="control"><label for="displayColor">Display background</label><input id="displayColor" type="color" data-setting="display" value="#111622"></div>
-      <div class="control"><label for="keyColor">Button color</label><input id="keyColor" type="color" data-setting="key" value="#292f41"></div>
-      <div class="control"><label for="textColor">Text color</label><input id="textColor" type="color" data-setting="text" value="#f5f7ff"></div>
-      <div class="control">
-        <label for="font">Font</label>
-        <select id="font" data-setting="font">
-          <option value="system">System default</option>
-          <option value="Arial, sans-serif">Arial</option>
-          <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
-          <option value="Georgia, serif">Georgia</option>
-          <option value="'Courier New', monospace">Monospace</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="rounding">Button roundness <output id="roundingValue">18px</output></label>
-        <input id="rounding" type="range" min="4" max="32" value="18" data-setting="radius">
-      </div>
-      <div class="control">
-        <label for="size">Calculator size <output id="sizeValue">100%</output></label>
-        <input id="size" type="range" min="85" max="115" value="100" data-setting="scale">
-      </div>
-      <div class="custom-buttons">
-        <button class="small-button" id="preset">Apply vibrant preset</button>
-        <button class="small-button" id="reset">Reset</button>
-      </div>
-      <div class="status" id="status" role="status"></div>
-      <div class="footer">Tip: use digits and + − × ÷, parentheses, ^, %, Enter, Backspace, and Escape on your keyboard.</div>
-    </aside>
   </main>
 
   <script>
     (() => {
       const root = document.documentElement;
+      const calculator = document.getElementById('calculator');
       const expressionEl = document.getElementById('expression');
       const resultEl = document.getElementById('result');
       const statusEl = document.getElementById('status');
-      const defaults = {
-        accent: '#8b7cff', page: '#10131c', surface: '#1b2030', display: '#111622',
-        key: '#292f41', text: '#f5f7ff', font: 'system', radius: 18, scale: 100
-      };
+      const defaults = { accent: '#ff9f0a', font: 'system', radius: 100, scale: 100 };
       let settings = { ...defaults };
       let expression = '';
       let justEvaluated = false;
-
-      function applySettings() {
-        for (const [key, value] of Object.entries(settings)) {
-          if (key === 'font') root.style.fontFamily = value === 'system' ? 'Inter, ui-sans-serif, system-ui, sans-serif' : value;
-          else if (key === 'radius') root.style.setProperty('--radius', `${value}px`);
-          else if (key === 'scale') root.style.setProperty('--scale', Number(value) / 100);
-          else root.style.setProperty(`--${key}`, value);
-          const control = document.querySelector(`[data-setting="${key}"]`);
-          if (control) control.value = value;
-        }
-        document.getElementById('roundingValue').textContent = `${settings.radius}px`;
-        document.getElementById('sizeValue').textContent = `${settings.scale}%`;
-        document.querySelector('.calculator').style.transform = `scale(${Number(settings.scale) / 100})`;
-        document.querySelector('.calculator').style.transformOrigin = 'top center';
-      }
-
-      function saveSettings() {
-        try { localStorage.setItem('custom-calculator-settings', JSON.stringify(settings)); }
-        catch (_) { statusEl.textContent = 'Could not save settings in this browser.'; }
-      }
+      let angleMode = 'DEG';
 
       try {
-        const saved = JSON.parse(localStorage.getItem('custom-calculator-settings') || 'null');
+        const saved = JSON.parse(localStorage.getItem('calculator-appearance') || 'null');
         if (saved && typeof saved === 'object') settings = { ...defaults, ...saved };
-      } catch (_) { /* Ignore invalid or unavailable saved preferences. */ }
-      applySettings();
+        const theme = localStorage.getItem('calculator-theme');
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+        angleMode = localStorage.getItem('calculator-angle') === 'RAD' ? 'RAD' : 'DEG';
+      } catch (_) { /* Storage may be disabled; calculator still works. */ }
 
+      function applySettings() {
+        root.style.setProperty('--accent', settings.accent);
+        root.style.setProperty('--accent-hover', settings.accent);
+        root.style.setProperty('--radius', `${settings.radius}%`);
+        root.style.setProperty('--scale', Number(settings.scale) / 100);
+        root.style.setProperty('--font', settings.font === 'system' ? 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' : settings.font);
+        document.querySelectorAll('[data-setting]').forEach(control => { control.value = settings[control.dataset.setting]; });
+        document.getElementById('roundingValue').textContent = `${settings.radius}%`;
+        document.getElementById('sizeValue').textContent = `${settings.scale}%`;
+      }
+      function saveSettings() {
+        try { localStorage.setItem('calculator-appearance', JSON.stringify(settings)); }
+        catch (_) { statusEl.textContent = 'Could not save preferences in this browser.'; }
+      }
+      applySettings();
+      document.getElementById('angleMode').textContent = angleMode;
       document.querySelectorAll('[data-setting]').forEach(control => {
         control.addEventListener('input', () => {
           settings[control.dataset.setting] = control.type === 'range' ? Number(control.value) : control.value;
-          applySettings();
-          saveSettings();
-          statusEl.textContent = 'Design saved.';
+          applySettings(); saveSettings(); statusEl.textContent = 'Appearance saved on this device.';
         });
+      });
+      document.getElementById('themeToggle').addEventListener('click', event => {
+        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        const light = root.dataset.theme === 'light';
+        event.currentTarget.textContent = light ? '☾' : '☼';
+        event.currentTarget.setAttribute('aria-label', `Switch to ${light ? 'dark' : 'light'} mode`);
+        try { localStorage.setItem('calculator-theme', root.dataset.theme); } catch (_) { /* Ignore unavailable storage. */ }
+      });
+      document.getElementById('angleMode').addEventListener('click', event => {
+        angleMode = angleMode === 'DEG' ? 'RAD' : 'DEG';
+        event.currentTarget.textContent = angleMode;
+        try { localStorage.setItem('calculator-angle', angleMode); } catch (_) { /* Ignore unavailable storage. */ }
       });
 
       function pretty(value) { return value.replaceAll('*', '×').replaceAll('/', '÷').replaceAll('-', '−'); }
@@ -260,35 +253,73 @@
         resultEl.textContent = message || (expression ? '…' : '0');
       }
 
-      // A small arithmetic parser avoids evaluating arbitrary JavaScript from input.
+      // Recursive-descent arithmetic parser: no eval(), so input is never executed as JavaScript.
       function calculate(source) {
-        const tokens = source.match(/\d*\.?\d+|[()+\-*/^%]/g) || [];
-        if (tokens.join('') !== source.replace(/\s/g, '')) throw new Error('Invalid expression');
+        const tokenPattern = /\s*(?:(\d+(?:\.\d*)?|\.\d+)|([a-zA-Z]+)|(π)|([()+\-*/^%!]))/gy;
+        const tokens = [];
+        let position = 0;
+        while (position < source.length) {
+          tokenPattern.lastIndex = position;
+          const match = tokenPattern.exec(source);
+          if (!match) throw new Error(`Unexpected character: ${source[position]}`);
+          tokens.push(match[1] || match[2]?.toLowerCase() || match[3] || match[4]);
+          position = tokenPattern.lastIndex;
+        }
         let i = 0;
         const peek = () => tokens[i];
         const take = () => tokens[i++];
+        const toRadians = x => angleMode === 'DEG' ? x * Math.PI / 180 : x;
+        const fromRadians = x => angleMode === 'DEG' ? x * 180 / Math.PI : x;
         function primary() {
-          if (peek() === '+') { take(); return primary(); }
-          if (peek() === '-') { take(); return -primary(); }
-          if (peek() === '(') {
-            take(); const value = sum();
-            if (take() !== ')') throw new Error('Missing )');
+          const token = take();
+          if (token === '(') {
+            const value = sum();
+            if (take() !== ')') throw new Error('Missing closing parenthesis');
             return value;
           }
-          const token = take();
-          if (token === undefined || !/^\d*\.?\d+$/.test(token)) throw new Error('Expected a number');
-          return Number(token);
+          if (token === 'π') return Math.PI;
+          if (token === 'e') return Math.E;
+          if (token !== undefined && /^\d+(?:\.\d*)?$|^\.\d+$/.test(token)) return Number(token);
+          const funcs = {
+            sin: x => Math.sin(toRadians(x)), cos: x => Math.cos(toRadians(x)), tan: x => Math.tan(toRadians(x)),
+            asin: x => fromRadians(Math.asin(x)), acos: x => fromRadians(Math.acos(x)), atan: x => fromRadians(Math.atan(x)),
+            sqrt: x => Math.sqrt(x), ln: x => Math.log(x), log: x => Math.log10(x), abs: x => Math.abs(x)
+          };
+          if (token in funcs) {
+            if (take() !== '(') throw new Error(`${token} needs parentheses`);
+            const value = sum();
+            if (take() !== ')') throw new Error('Missing closing parenthesis');
+            return funcs[token](value);
+          }
+          throw new Error('Expected a number or function');
         }
-        function power() {
+        function postfix() {
           let value = primary();
-          if (peek() === '^') { take(); value = value ** power(); }
-          while (peek() === '%') { take(); value /= 100; }
+          while (peek() === '%' || peek() === '!') {
+            const op = take();
+            if (op === '%') value /= 100;
+            else {
+              if (value < 0 || !Number.isInteger(value) || value > 170) throw new Error('Factorial needs an integer from 0 to 170');
+              let result = 1;
+              for (let n = 2; n <= value; n++) result *= n;
+              value = result;
+            }
+          }
           return value;
         }
+        function power() {
+          const value = postfix();
+          return peek() === '^' ? (take(), value ** unary()) : value;
+        }
+        function unary() {
+          if (peek() === '+') { take(); return unary(); }
+          if (peek() === '-') { take(); return -unary(); }
+          return power();
+        }
         function product() {
-          let value = power();
+          let value = unary();
           while (peek() === '*' || peek() === '/') {
-            const op = take(), rhs = power();
+            const op = take(), rhs = unary();
             if (op === '/' && rhs === 0) throw new Error('Cannot divide by zero');
             value = op === '*' ? value * rhs : value / rhs;
           }
@@ -302,13 +333,14 @@
           }
           return value;
         }
+        if (!tokens.length) throw new Error('Enter a calculation');
         const value = sum();
         if (i !== tokens.length || !Number.isFinite(value)) throw new Error('Invalid calculation');
         return Number(value.toPrecision(12)).toString();
       }
 
       function append(value) {
-        if (justEvaluated && /[0-9.(]/.test(value)) expression = '';
+        if (justEvaluated && /[0-9.(πa-z]/i.test(value)) expression = '';
         justEvaluated = false;
         expression += value;
         updateDisplay();
@@ -321,42 +353,41 @@
           resultEl.textContent = answer;
           expression = answer;
           justEvaluated = true;
-        } catch (error) {
-          resultEl.textContent = error.message || 'Error';
-        }
+        } catch (error) { resultEl.textContent = error.message || 'Error'; }
       }
-      function doAction(action) {
-        if (action === 'clear') { expression = ''; justEvaluated = false; updateDisplay(); }
-        else if (action === 'backspace') { expression = expression.slice(0, -1); justEvaluated = false; updateDisplay(); }
-        else if (action === 'equals') evaluate();
-        else if (action === 'sign') {
-          if (!expression) expression = '-';
-          else if (justEvaluated) expression = String(-Number(expression));
-          else expression = `-(${expression})`;
+      function action(name) {
+        if (name === 'clear') { expression = ''; justEvaluated = false; updateDisplay(); }
+        else if (name === 'backspace') { expression = expression.slice(0, -1); justEvaluated = false; updateDisplay(); }
+        else if (name === 'equals') evaluate();
+        else if (name === 'sign') {
+          expression = expression ? (justEvaluated ? String(-Number(expression)) : `-(${expression})`) : '-';
           justEvaluated = false; updateDisplay();
+        } else if (name === 'scientific') {
+          calculator.classList.toggle('scientific-open');
+          const open = calculator.classList.contains('scientific-open');
+          document.getElementById('scientificToggle').setAttribute('aria-label', `${open ? 'Hide' : 'Show'} scientific functions`);
         }
       }
 
-      document.getElementById('keys').addEventListener('click', event => {
+      document.querySelectorAll('.calculator').forEach(section => section.addEventListener('click', event => {
         const button = event.target.closest('button');
         if (!button) return;
-        if (button.dataset.action) doAction(button.dataset.action);
-        else if (button.dataset.value !== undefined) append(button.dataset.value);
-      });
+        if (button.dataset.action) action(button.dataset.action);
+        else if (button.dataset.insert !== undefined) append(button.dataset.insert);
+      }));
       document.addEventListener('keydown', event => {
         if (/^[0-9.]$/.test(event.key)) append(event.key);
-        else if (['+', '-', '*', '/', '^', '%', '(', ')'].includes(event.key)) append(event.key);
+        else if (['+', '-', '*', '/', '^', '%', '(', ')', '!'].includes(event.key)) append(event.key);
+        else if (/^[a-zA-Z]$/.test(event.key)) append(event.key.toLowerCase());
         else if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); evaluate(); }
-        else if (event.key === 'Backspace') doAction('backspace');
-        else if (event.key === 'Escape' || event.key === 'Delete') doAction('clear');
+        else if (event.key === 'Backspace') action('backspace');
+        else if (event.key === 'Escape' || event.key === 'Delete') action('clear');
       });
-
       document.getElementById('preset').addEventListener('click', () => {
-        settings = { ...settings, accent: '#ff6b8a', page: '#17101b', surface: '#291c31', display: '#1c1423', key: '#392743', text: '#fff5fb' };
-        applySettings(); saveSettings(); statusEl.textContent = 'Vibrant preset applied and saved.';
+        settings.accent = '#ff4f79'; applySettings(); saveSettings(); statusEl.textContent = 'Vibrant accent applied.';
       });
       document.getElementById('reset').addEventListener('click', () => {
-        settings = { ...defaults }; applySettings(); saveSettings(); statusEl.textContent = 'Default design restored.';
+        settings = { ...defaults }; applySettings(); saveSettings(); statusEl.textContent = 'Appearance reset.';
       });
     })();
   </script>
